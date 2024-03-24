@@ -1,3 +1,37 @@
+from enum import Enum
+
+class Algorithm(Enum):
+    MINIMAX = 1
+    ALPHA_BETA = 2
+
+class Player(Enum):
+    Lietotajs = 1
+    Dators = 2
+
+def choose_starting_player() -> Player:
+    while True:
+        print("Izvēlieties, kurš sāks spēli:")
+        print("Lietotājs vai dators")
+        choice = input("Ievadiet izvēlēto spēlētāju (l vai d): ")
+        if choice == "l":
+            return Player.Lietotajs
+        elif choice == "d":
+            return Player.Dators
+        else:
+            print("Nepareiza izvēle. Mēģiniet vēlreiz.")
+
+def choose_algorithm() -> Algorithm:
+    while True:
+        print("Izvēlieties algoritmu, kuru izmantos dators:")
+        print("Minimaksa algoritms vai Alfa-beta algoritms")
+        choice = input("Ievadiet izvēlēto algoritmu (m vai a): ")
+        if choice == "m":
+            return Algorithm.MINIMAX
+        elif choice == "a":
+            return Algorithm.ALPHA_BETA
+        else:
+            print("Nepareiza izvēle. Mēģiniet vēlreiz.")
+
 class State:
     number: int
     points: int
@@ -61,7 +95,7 @@ def print_tree(index=0):
 while True:  # Viens no uzdevumiem ir "uzsākt spēli atkārtoti pēc kārtējās spēles pabeigšanas."
     points = 0
     bank = 0
-    player = 1
+    player = choose_starting_player()
     number = int_input('Ievadiet skaitli no 20 līdz 30: ', range(20, 31))
 
     gameTree = [State(number, points, bank, 0)]
@@ -70,10 +104,18 @@ while True:  # Viens no uzdevumiem ir "uzsākt spēli atkārtoti pēc kārtējā
     
     while number < 3000:
         print(player, '. spēlētāja gājiens', sep='')
-        number *= int_input('Ievadiet reizinātāju (3, 4 vai 5): ', range(3, 6))
+        if player == Player.Lietotajs:
+            number *= int_input('Ievadiet reizinātāju (3, 4 vai 5): ', range(3, 6))
+        else:
+            if algorithm == Algorithm.MINIMAX:
+                pass
+            elif algorithm == Algorithm.ALPHA_BETA:
+                pass
+        
         points += 1 if number % 2 == 0 else -1
         bank += 1 if number % 5 == 0 else 0
-        player = (player % 2) + 1
+        #player = (player % 2) + 1
+        player = Player.Lietotajs if player == Player.Dators else Player.COMPUTER
         print('skailtis:', number, '| punkti:', points, '| banka:', bank)
     
     points += bank * (-1 if points % 2 == 0 else 1)
@@ -81,6 +123,6 @@ while True:  # Viens no uzdevumiem ir "uzsākt spēli atkārtoti pēc kārtējā
     print('Uzvar ', (points % 2) + 1, '. spēlētājs', sep='')
 
     # Cikls būs bezgalīgs, taču mēs varam ļaut spēlētājam pašam izlemt, ko darīt tālak
-    # play_again = input("Vai vēlaties spēlēt vēlreiz? (j/n): ")
-    # if play_again.lower() != "j":
-    #     break
+    play_again = input("Vai vēlaties spēlēt vēlreiz? (j/n): ")
+    if play_again.lower() != "j":
+        break
