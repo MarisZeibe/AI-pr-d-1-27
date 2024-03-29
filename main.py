@@ -33,9 +33,15 @@ def choose_algorithm() -> Algorithm:
         else:
             print("Nepareiza izvēle. Mēģiniet vēlreiz.")
 
+def evaluate_state(state):
+    distance_to_goal = abs(3000 - state.number)
+    points = state.points
+    bank_points = state.bank
+    return distance_to_goal * 0.3 + points * 0.5 + bank_points * 0.2
+
 def minimax_search(state, player):
   if state.number > 3000:
-      return state.points
+      return evaluate_state(state)
 
   if player == Player.Lietotajs:
       best_value = float('-inf')
@@ -53,7 +59,7 @@ def minimax_search(state, player):
 
 def alpha_beta_search(state, alpha, beta, player):
   if state.number > 3000:
-      return state.points
+      return evaluate_state(state)
 
   if player == Player.Lietotajs:
       value = float('-inf')
