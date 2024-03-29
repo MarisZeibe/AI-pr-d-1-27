@@ -1,0 +1,97 @@
+import tkinter as tk
+from tkinter import messagebox
+import random
+from enum import Enum
+
+class Algorithm(Enum):
+    MINIMAX = 1
+    ALPHA_BETA = 2
+
+class Player(Enum):
+    USER = 1
+    COMPUTER = 2
+
+class GameApp:
+    def __init__(self, master):
+        self.master = master
+        self.points = 0
+        self.bank = 0
+        self.player = None
+        self.algorithm = None
+        self.number = None
+
+        self.setup_game()
+
+    def setup_game(self):
+        self.frame = tk.Frame(self.master)
+        self.frame.pack()
+
+        self.start_label = tk.Label(self.frame, text="Izvēlieties, kurš sāks spēli:")
+        self.start_label.pack()
+
+        self.user_button = tk.Button(self.frame, text="Lietotājs", command=lambda: self.set_starting_player(Player.USER))
+        self.user_button.pack()
+
+        self.computer_button = tk.Button(self.frame, text="Dators", command=lambda: self.set_starting_player(Player.COMPUTER))
+        self.computer_button.pack()
+
+    def set_starting_player(self, player):
+        self.player = player
+        self.frame.destroy()
+        self.setup_algorithm()
+
+    def setup_algorithm(self):
+        self.frame = tk.Frame(self.master)
+        self.frame.pack()
+
+        self.algorithm_label = tk.Label(self.frame, text="Izvēlieties algoritmu, kuru izmantos dators:")
+        self.algorithm_label.pack()
+
+        self.minimax_button = tk.Button(self.frame, text="Minimaksa algoritms", command=lambda: self.set_algorithm(Algorithm.MINIMAX))
+        self.minimax_button.pack()
+
+        self.alpha_beta_button = tk.Button(self.frame, text="Alfa-beta algoritms", command=lambda: self.set_algorithm(Algorithm.ALPHA_BETA))
+        self.alpha_beta_button.pack()
+
+    def set_algorithm(self, algorithm):
+        self.algorithm = algorithm
+        self.frame.destroy()
+        self.enter_number()
+
+    def enter_number(self):
+        self.frame = tk.Frame(self.master)
+        self.frame.pack()
+
+        self.number_label = tk.Label(self.frame, text="Ievadiet skaitli no 20 līdz 30:")
+        self.number_label.pack()
+
+        self.number_entry = tk.Entry(self.frame)
+        self.number_entry.pack()
+
+        self.submit_button = tk.Button(self.frame, text="Iesniegt", command=self.start_game)
+        self.submit_button.pack()
+
+    def start_game(self):
+        try:
+            self.number = int(self.number_entry.get())
+            if self.number < 20 or self.number > 30:
+                messagebox.showerror("Kļūda", "Skaitlim jābūt no 20 līdz 30")
+                return
+        except ValueError:
+            messagebox.showerror("Kļūda", "Ievadītā vērtība nav skaitlis")
+            return
+
+        self.frame.destroy()
+        self.play_game()
+
+    def play_game(self):
+        pass
+
+def main():
+    root = tk.Tk()
+    root.title("Spēle")
+    app = GameApp(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
