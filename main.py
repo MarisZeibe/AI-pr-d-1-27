@@ -37,16 +37,16 @@ def minimax_search(state, player):
   if state.number > 3000:
       return state.points
 
-  if player == Player.USER:
+  if player == Player.Lietotajs:
       best_value = float('-inf')
       for child_index in state.children:
-          child_value = minimax_search(gameTree[child_index], Player.COMPUTER)
+          child_value = minimax_search(gameTree[child_index], Player.Dators)
           best_value = max(best_value, child_value)
       return best_value
   else:
       best_value = float('inf')
       for child_index in state.children:
-          child_value = minimax_search(gameTree[child_index], Player.USER)
+          child_value = minimax_search(gameTree[child_index], Player.Lietotajs)
           best_value = min(best_value, child_value)
       return best_value
 
@@ -55,10 +55,10 @@ def alpha_beta_search(state, alpha, beta, player):
   if state.number > 3000:
       return state.points
 
-  if player == Player.USER:
+  if player == Player.Lietotajs:
       value = float('-inf')
       for child_index in state.children:
-          child_value = alpha_beta_search(gameTree[child_index], alpha, beta, Player.COMPUTER)
+          child_value = alpha_beta_search(gameTree[child_index], alpha, beta, Player.Dators)
           value = max(value, child_value)
           alpha = max(alpha, value)
           if alpha >= beta:
@@ -67,7 +67,7 @@ def alpha_beta_search(state, alpha, beta, player):
   else:
       value = float('inf')
       for child_index in state.children:
-          child_value = alpha_beta_search(gameTree[child_index], alpha, beta, Player.USER)
+          child_value = alpha_beta_search(gameTree[child_index], alpha, beta, Player.Lietotajs)
           value = min(value, child_value)
           beta = min(beta, value)
           if alpha >= beta:
@@ -188,7 +188,7 @@ while True:
         points += 1 if number % 2 == 0 else -1
         bank += 1 if number % 5 == 0 else 0
         #player = (player % 2) + 1
-        player = Player.Lietotajs if player == Player.Dators else Player.COMPUTER
+        player = Player.Lietotajs if player == Player.Dators else Player.Dators
         print('skailtis:', number, '| punkti:', points, '| banka:', bank)
     
     points += bank * (-1 if points % 2 == 0 else 1)
