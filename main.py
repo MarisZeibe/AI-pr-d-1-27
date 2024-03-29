@@ -1,3 +1,4 @@
+import random
 from enum import Enum
 
 class Algorithm(Enum):
@@ -31,6 +32,47 @@ def choose_algorithm() -> Algorithm:
             return Algorithm.ALPHA_BETA
         else:
             print("Nepareiza izvēle. Mēģiniet vēlreiz.")
+
+def minimax_search(state, player):
+  if state.number > 3000:
+      return state.points
+
+  if player == Player.USER:
+      best_value = float('-inf')
+      for child_index in state.children:
+          child_value = minimax_search(gameTree[child_index], Player.COMPUTER)
+          best_value = max(best_value, child_value)
+      return best_value
+  else:
+      best_value = float('inf')
+      for child_index in state.children:
+          child_value = minimax_search(gameTree[child_index], Player.USER)
+          best_value = min(best_value, child_value)
+      return best_value
+
+
+def alpha_beta_search(state, alpha, beta, player):
+  if state.number > 3000:
+      return state.points
+
+  if player == Player.USER:
+      value = float('-inf')
+      for child_index in state.children:
+          child_value = alpha_beta_search(gameTree[child_index], alpha, beta, Player.COMPUTER)
+          value = max(value, child_value)
+          alpha = max(alpha, value)
+          if alpha >= beta:
+              break
+      return value
+  else:
+      value = float('inf')
+      for child_index in state.children:
+          child_value = alpha_beta_search(gameTree[child_index], alpha, beta, Player.USER)
+          value = min(value, child_value)
+          beta = min(beta, value)
+          if alpha >= beta:
+              break
+      return value
 
 class State:
     number: int
@@ -92,10 +134,11 @@ def print_tree(index=0):
         print_tree(x)
 
 
-while True:  # Viens no uzdevumiem ir "uzsākt spēli atkārtoti pēc kārtējās spēles pabeigšanas."
+while True:
     points = 0
     bank = 0
     player = choose_starting_player()
+    algorithm = choose_algorithm()
     number = int_input('Ievadiet skaitli no 20 līdz 30: ', range(20, 31))
 
     gameTree = [State(number, points, bank, 0)]
@@ -108,9 +151,39 @@ while True:  # Viens no uzdevumiem ir "uzsākt spēli atkārtoti pēc kārtējā
             number *= int_input('Ievadiet reizinātāju (3, 4 vai 5): ', range(3, 6))
         else:
             if algorithm == Algorithm.MINIMAX:
-                pass
+                available_moves = [3, 4, 5]
+                best_value = float('-inf')
+                best_move = None
+                for move in available_moves:
+                    new_number = number * move
+                    new_points = points + (1 if new_number % 2 == 0 else -1)
+                    new_bank = bank + (1 if new_number % 5 == 0 else 0)
+                    new_level = gameTree[0].level + 1
+                    child_state = State(new_number, new_points, new_bank, new_level)
+                    value = minimax_search(child_state, player)
+                    if value > best_value:
+                        best_value = value
+                        best_move = move
+
+                number *= best_move
+                print('Datora gājiens. Izvēlēts skaitlis:', best_move)
             elif algorithm == Algorithm.ALPHA_BETA:
-                pass
+                available_moves = [3, 4, 5]
+                best_value = float('-inf')
+                best_move = None
+                for move in available_moves:
+                    new_number = number * move
+                    new_points = points + (1 if new_number % 2 == 0 else -1)
+                    new_bank = bank + (1 if new_number % 5 == 0 else 0)
+                    new_level = gameTree[0].level + 1
+                    child_state = State(new_number, new_points, new_bank, new_level)
+                    value = alpha_beta_search(child_state, float('-inf'), float('inf'), player)
+                    if value > best_value:
+                        best_value = value
+                        best_move = move
+
+                number *= best_move
+                print('Datora gājiens. Izvēlēts skaitlis:', best_move)
         
         points += 1 if number % 2 == 0 else -1
         bank += 1 if number % 5 == 0 else 0
@@ -122,7 +195,6 @@ while True:  # Viens no uzdevumiem ir "uzsākt spēli atkārtoti pēc kārtējā
     print('Spēle beidzās, gala punkti:', points)
     print('Uzvar ', (points % 2) + 1, '. spēlētājs', sep='')
 
-    # Cikls būs bezgalīgs, taču mēs varam ļaut spēlētājam pašam izlemt, ko darīt tālak
     play_again = input("Vai vēlaties spēlēt vēlreiz? (j/n): ")
     if play_again.lower() != "j":
         break
