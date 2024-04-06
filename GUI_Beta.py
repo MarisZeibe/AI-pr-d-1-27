@@ -19,23 +19,23 @@ class State:
         self.children = []
 
 def choose_starting_player():
-    choice = simpledialog.askstring("Player Choice", "Choose starting player: (Lietotajs or Dators)")
-    if choice.lower() == "lietotajs":
+    choice = simpledialog.askstring("Spēlētāja izvēle", "Izvēlieties, kurš sāks spēli: lietotajs (l) vai dators (d)")
+    if choice.lower() == "l":
         return Player.Lietotajs
-    elif choice.lower() == "dators":
+    elif choice.lower() == "d":
         return Player.Dators
     else:
-        messagebox.showerror("Error", "Invalid choice. Please choose 'Lietotajs' or 'Dators'.")
+        messagebox.showerror("Error", "Kļūda. Lūdzu, ievadiet 'l' vai 'd'")
         return choose_starting_player()
 
 def choose_algorithm():
-    choice = simpledialog.askstring("Algorithm Choice", "Choose algorithm: (Minimaksa algoritms or Alfa-beta algoritms)")
-    if choice.lower() == "minimaksa algoritms":
+    choice = simpledialog.askstring("Algoritma izvēle", "Izvēlieties algoritmu: Minimaksa algoritms (m) vai Alfa-beta algoritms (a)")
+    if choice.lower() == "m":
         return Algorithm.MINIMAX
-    elif choice.lower() == "alfa-beta algoritms":
+    elif choice.lower() == "a":
         return Algorithm.ALPHA_BETA
     else:
-        messagebox.showerror("Error", "Invalid choice. Please choose 'Minimaksa algoritms' or 'Alfa-beta algoritms'.")
+        messagebox.showerror("Error", "Kļūda. Lūdzu, ievadiet 'm' vai 'a'")
         return choose_algorithm()
 
 def int_input(message: str, number_range: range) -> int:
@@ -45,9 +45,9 @@ def int_input(message: str, number_range: range) -> int:
             if input_number in number_range:
                 return input_number
             else:
-                messagebox.showerror("Error", "Invalid input. Please enter a number between 20 and 30.")
+                messagebox.showerror("Error", "Kļūda. Lūdzu, ievadiet skaitli no 20 līdz 30")
         except ValueError:
-            messagebox.showerror("Error", "Invalid input. Please enter a valid number.")
+            messagebox.showerror("Error", "Kļūda. Lūdzu, ievadiet skaitli no 20 līdz 30")
 
 def generate_tree(index: int):
     global gameTree
@@ -73,7 +73,7 @@ def start_game():
     global points, bank, number, gameTree
     points = 0
     bank = 0
-    number = int_input('Enter a number from 20 to 30: ', range(20, 31))
+    number = int_input('Ievadiet skaitli no 20 līdz 30', range(20, 31))
 
     player = choose_starting_player()
     algorithm = choose_algorithm()
@@ -83,7 +83,7 @@ def start_game():
 
     while number < 3000:
         if player == Player.Lietotajs:
-            multiplier = int_input('Enter a multiplier (3, 4, or 5): ', range(3, 6))
+            multiplier = int_input('Ievadiet reizinātāju 3, 4 vai 5: ', range(3, 6))
             # Update moves log
             moves_log.insert(tk.END, f"Lietotajs: {multiplier}\n")
             number *= multiplier
@@ -135,7 +135,7 @@ def start_game():
         bank_label.config(text=f"Banka: {bank}")
 
     points += bank * (-1 if points % 2 == 0 else 1)
-    winner = "Lietotajs" if player == Player.Dators else "Dators"
+    winner = "lietotajs" if player == Player.Dators else "dators"
     messagebox.showinfo("Game Over", f"Spēle beidzās, gala punkti: {points}\nUzvar {winner}.")
 
 def minimax_search(state, player):
@@ -186,14 +186,14 @@ def evaluate_state(state):
 
 # Create Tkinter window
 root = tk.Tk()
-root.title("Number Game")
+root.title("Spēle")
 
 # Create GUI elements
-start_button = tk.Button(root, text="Start Game", command=start_game)
+start_button = tk.Button(root, text="Sākt spēli", command=start_game)
 number_label = tk.Label(root, text="Skaitlis: ")
 points_label = tk.Label(root, text="Punkti: ")
 bank_label = tk.Label(root, text="Banka: ")
-moves_label = tk.Label(root, text="Moves:")
+moves_label = tk.Label(root, text="Gājieni:")
 moves_log = tk.Text(root, width=30, height=10)
 
 # Grid positioning
