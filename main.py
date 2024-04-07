@@ -39,16 +39,16 @@ def choose_algorithm() -> Algorithm:
 
 
 def evaluate_state(state):
-    # distance_to_goal = abs(3000 - state.number)
-    # points = state.points
-    # bank_points = state.bank
-    # return distance_to_goal * 0.3 + points * 0.5 + bank_points * 0.2
-    # return 1 if (state.points + ((state.bank * (-1 if state.points % 2 == 0 else 1)) if state.number > 3000 else 0)) % 2 == 0 else -1
+    # Vai stāvoklis ir labvēlīgs pirmajam spēlētājam (maksimizētājam) vai otrajam spēlētājam (minimizētājam)
     k = 1 if ((state.bank + state.points) % 2 == 0) else -1
-    x1 = k * min(state.bank, 1)
-    x2 = k * (1 if state.number >= 3000 else 0) * (3000 * 5 - state.number) / (3000 * 5 - 20) #k * (1 if state.number > 3000 else 0) * (15000 - state.number) / (15000 - 20)
-    x3 = k * (0 if state.number >= 3000 else 1) * state.number / (3000 * 5 - 20)
-    return 100*x1 + 10*x2 + 1*x3
+    # Vai spēles banka ir lielāka par 0
+    x1 = min(state.bank, 1)
+    # Ja ir spēles beigu stāvoklis, mazākam skaitlim ir lielāka vērtība
+    x2 = (1 if state.number >= 3000 else 0) * (3000 * 5 - state.number) / (3000 * 5 - 20)
+    # Ja nav spēles beigu stāvoklis, lielākam skaitlim ir lielāka vērtība
+    x3 = (0 if state.number >= 3000 else 1) * state.number / (3000 * 5 - 20)
+
+    return k * (100*x1 + 10*x2 + 1*x3)
 
 
 def minimax_search(state, player):
