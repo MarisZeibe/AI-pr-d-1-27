@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 from enum import Enum
+from time import perf_counter
 
 GUI_MODE = True
 DEBUG = True
@@ -176,6 +177,7 @@ class Game:
         self.state = self.state.next_state(multiplier)
 
     def computer_move(self) -> int:
+        time1 = perf_counter()
         tree = generate_tree([self.state])
         if self.algorithm == Algorithm.MINIMAX:
             multiplier = int(minimax_search(tree)['index']) + MIN_MULTIPLIER
@@ -183,7 +185,9 @@ class Game:
             multiplier = int(alpha_beta_search(tree)['index']) + MIN_MULTIPLIER
         self.user_move(multiplier)
         if DEBUG:
+            time2 = perf_counter()
             print_tree(tree, self.algorithm)
+            print(f'Computer spent {(time2 - time1)*1000:.3f} miliseconds making a move')
         return multiplier
 
     def get_current_player(self) -> Player:
