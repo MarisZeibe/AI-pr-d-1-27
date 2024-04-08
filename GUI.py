@@ -85,21 +85,22 @@ def generate_tree(tree: list[State], index=0, depth=SEARCH_DEPTH) -> list[State]
     return tree
 
 
-def print_tree(tree: list[State], algorithm: Algorithm | None = None, index=0) -> None:
+def print_tree(tree: list[State], algorithm: Algorithm | None = None, index=0, offset=0) -> None:
     if algorithm == Algorithm.MINIMAX:
         minimax_search(tree)
     elif algorithm == Algorithm.ALPHA_BETA:
         alpha_beta_search(tree)
-    print('\t' * tree[index].level, end='')
-    print(f'number: {tree[index].number:<5}', end=' ')
-    print(f'points: {tree[index].points:<2}', end=' ')
-    print(f'bank: {tree[index].bank}', end=' ')
-    print(f'value: {tree[index].evaluate_state():<9.4f}', end=' ')
+    print('\t' * offset, end='')
+    print(f'number: {tree[index].number:<5}', end=' | ')
+    print(f'points: {tree[index].points:<2}', end=' | ')
+    print(f'bank: {tree[index].bank}', end=' | ')
+    print(f'level:', 'MAX' if tree[index].level % 2 == 0 else 'MIN', end=' | ')
+    print(f'value: {tree[index].evaluate_state():<9.4f}', end=' | ')
     if tree[index].value is not None:
         print(f'algorithm: {tree[index].value:.4f}', end='')
     print()
     for state_index in tree[index].children:
-        print_tree(tree, None, state_index)
+        print_tree(tree, None, state_index, offset + 1)
 
 
 def minimax_search(tree: list[State], index=0) -> dict[str, float]:
@@ -295,6 +296,9 @@ class GUI(tk.Tk):
         self.start_button.grid(row=3, columnspan=3)
 
     def initialize_game(self):
+        if int(self.start_num_entry.get()) not in range(MIN_START_NUMBER, MAX_START_NUMBER + 1):
+            messagebox.showinfo("Kļūda", "Nepareizs skaitlis")
+            return
         starting_player = Player.USER if self.player_var.get() == "user" else Player.COMPUTER
         algorithm_choice = Algorithm.MINIMAX if self.algorithm_var.get() == "minimax" else Algorithm.ALPHA_BETA
         starting_number = int(self.start_num_entry.get())
@@ -325,6 +329,9 @@ class GUI(tk.Tk):
             self.computer_turn()
 
     def user_move(self):
+        if int(self.turn_entry.get()) not in range(MIN_MULTIPLIER, MAX_MULTIPLIER + 1):
+            messagebox.showinfo("Kļūda", "Nepareizs skaitlis")
+            return
         multiplier = int(self.turn_entry.get())
         self.game.user_move(multiplier)
         self.update_game_info()

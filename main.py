@@ -1,6 +1,8 @@
+import tkinter as tk
+from tkinter import simpledialog, messagebox
 from enum import Enum
 
-GUI_MODE = False
+GUI_MODE = True
 DEBUG = True
 SEARCH_DEPTH = 2
 END_NUMBER = 3000
@@ -83,21 +85,22 @@ def generate_tree(tree: list[State], index=0, depth=SEARCH_DEPTH) -> list[State]
     return tree
 
 
-def print_tree(tree: list[State], algorithm: Algorithm | None = None, index=0) -> None:
+def print_tree(tree: list[State], algorithm: Algorithm | None = None, index=0, offset=0) -> None:
     if algorithm == Algorithm.MINIMAX:
         minimax_search(tree)
     elif algorithm == Algorithm.ALPHA_BETA:
         alpha_beta_search(tree)
-    print('\t' * tree[index].level, end='')
-    print(f'number: {tree[index].number:<5}', end=' ')
-    print(f'points: {tree[index].points:<2}', end=' ')
-    print(f'bank: {tree[index].bank}', end=' ')
-    print(f'value: {tree[index].evaluate_state():<9.4f}', end=' ')
+    print('\t' * offset, end='')
+    print(f'number: {tree[index].number:<5}', end=' | ')
+    print(f'points: {tree[index].points:<2}', end=' | ')
+    print(f'bank: {tree[index].bank}', end=' | ')
+    print(f'level:', 'MAX' if tree[index].level % 2 == 0 else 'MIN', end=' | ')
+    print(f'value: {tree[index].evaluate_state():<9.4f}', end=' | ')
     if tree[index].value is not None:
         print(f'algorithm: {tree[index].value:.4f}', end='')
     print()
     for state_index in tree[index].children:
-        print_tree(tree, None, state_index)
+        print_tree(tree, None, state_index, offset + 1)
 
 
 def minimax_search(tree: list[State], index=0) -> dict[str, float]:
@@ -236,9 +239,142 @@ def choose_starting_number() -> int:
     return int_input(f'Ievadiet skaitli no {MIN_START_NUMBER} līdz {MAX_START_NUMBER}: ',
                      range(MIN_START_NUMBER, MAX_START_NUMBER + 1))
 
+class GUI(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Spēle")
+        self.geometry("500x250")
+
+        self.game_frame = tk.Frame(self)
+        self.game_frame.pack()
+
+        self.game_label = tk.Label(self.game_frame, text="27. komanda")
+        self.game_label.pack()
+
+        self.number_label = tk.Label(self.game_frame, text="Skaitlis: ")
+        self.number_label.pack()
+
+        self.points_label = tk.Label(self.game_frame, text="Punkti: ")
+        self.points_label.pack()
+
+        self.bank_label = tk.Label(self.game_frame, text="Banka: ")
+        self.bank_label.pack()
+
+        self.start_game()
+
+    def start_game(self):
+        self.start_frame = tk.Frame(self)
+        self.start_frame.pack()
+
+        self.player_label = tk.Label(self.start_frame, text="Izvēlieties, kurš sāks spēli:")
+        self.player_label.grid(row=0, column=0)
+
+        self.player_var = tk.StringVar(self.start_frame, value="user")
+        self.player_radio_user = tk.Radiobutton(self.start_frame, text="Lietotājs", variable=self.player_var, value="user")
+        self.player_radio_user.grid(row=0, column=1)
+
+        self.player_radio_computer = tk.Radiobutton(self.start_frame, text="Dators", variable=self.player_var, value="computer")
+        self.player_radio_computer.grid(row=0, column=2)
+
+        self.algorithm_label = tk.Label(self.start_frame, text="Izvēlieties algoritmu, kuru izmantos dators")
+        self.algorithm_label.grid(row=1, column=0)
+
+        self.algorithm_var = tk.StringVar(self.start_frame, value="minimax")
+        self.algorithm_radio_minimax = tk.Radiobutton(self.start_frame, text="Minimax", variable=self.algorithm_var, value="minimax")
+        self.algorithm_radio_minimax.grid(row=1, column=1)
+
+        self.algorithm_radio_alpha_beta = tk.Radiobutton(self.start_frame, text="Alpha-Beta", variable=self.algorithm_var, value="alpha_beta")
+        self.algorithm_radio_alpha_beta.grid(row=1, column=2)
+
+        self.start_num_label = tk.Label(self.start_frame, text="Ievadiet skaitli (no 20 līdz 30):")
+        self.start_num_label.grid(row=2, column=0)
+
+        self.start_num_entry = tk.Entry(self.start_frame)
+        self.start_num_entry.grid(row=2, column=1)
+
+        self.start_button = tk.Button(self.start_frame, text="Sākt spēli", command=self.initialize_game)
+        self.start_button.grid(row=3, columnspan=3)
+
+    def initialize_game(self):
+        if int(self.start_num_entry.get()) not in range(MIN_START_NUMBER, MAX_START_NUMBER + 1):
+            messagebox.showinfo("Kļūda", "Nepareizs skaitlis")
+            return
+        starting_player = Player.USER if self.player_var.get() == "user" else Player.COMPUTER
+        algorithm_choice = Algorithm.MINIMAX if self.algorithm_var.get() == "minimax" else Algorithm.ALPHA_BETA
+        starting_number = int(self.start_num_entry.get())
+
+        self.game = Game(starting_player, algorithm_choice, starting_number)
+        self.current_player = starting_player
+
+        self.start_frame.pack_forget()
+        self.game_frame.pack()
+
+        self.show_turn_widgets()
+
+    def show_turn_widgets(self):
+        self.number_label.config(text=f"Skaitlis: {self.game.state.number}")
+        if self.current_player == Player.USER:
+            if not hasattr(self, 'turn_label'):
+                self.turn_label = tk.Label(self.game_frame, text="Ievadiet reizinātāju (no 3 līdz 5):")
+                self.turn_label.pack()
+
+            if not hasattr(self, 'turn_entry'):
+                self.turn_entry = tk.Entry(self.game_frame)
+                self.turn_entry.pack()
+
+            if not hasattr(self, 'turn_button'):
+                self.turn_button = tk.Button(self.game_frame, text="Ok", command=self.user_move)
+                self.turn_button.pack()
+        else:
+            self.computer_turn()
+
+    def user_move(self):
+        if int(self.turn_entry.get()) not in range(MIN_MULTIPLIER, MAX_MULTIPLIER + 1):
+            messagebox.showinfo("Kļūda", "Nepareizs skaitlis")
+            return
+        multiplier = int(self.turn_entry.get())
+        self.game.user_move(multiplier)
+        self.update_game_info()
+        self.play_turn()
+
+    def play_turn(self):
+        if not self.game.is_game_finished():
+            if self.current_player == Player.USER:
+                self.current_player = Player.COMPUTER
+            else:
+                self.current_player = Player.USER
+
+            self.show_turn_widgets()
+        else:
+            self.end_game()
+
+    def computer_turn(self):
+        multiplier = self.game.computer_move()
+        messagebox.showinfo("Datora gājiens", f"Dators izvēlējās reizinātāju: {multiplier}")
+        self.update_game_info()
+        self.play_turn()
+
+    def update_game_info(self):
+        self.number_label.config(text=f"Skaitlis: {self.game.state.number}")
+        self.points_label.config(text=f"Punkti: {self.game.state.points}")
+        self.bank_label.config(text=f"Banka: {self.game.state.bank}")
+
+    def end_game(self):
+        points = self.game.state.points
+        points += self.game.state.bank * (-1 if points % 2 == 0 else 1)
+        winner = "lietotajs" if self.game.get_winner() == Player.USER else "dators"
+        messagebox.showinfo("Spēles beigas", f"Spēle beidzās, gala punkti: {points}\nUzvar {winner}.")
+
+        self.restart_game()
+
+    def restart_game(self):
+        self.game_frame.pack_forget()
+        self.start_game()
+
 
 if GUI_MODE:
-    pass
+    root = GUI()
+    root.mainloop()
 else:
     while True:
         game = Game(choose_starting_player(), choose_algorithm(), choose_starting_number())
