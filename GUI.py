@@ -311,7 +311,7 @@ class GUI(tk.Tk):
         self.number_label.config(text=f"Skaitlis: {self.game.state.number}")
         if self.current_player == Player.USER:
             if not hasattr(self, 'turn_label'):
-                self.turn_label = tk.Label(self.game_frame, text="Ievadiet reizinātāju:")
+                self.turn_label = tk.Label(self.game_frame, text="Ievadiet reizinātāju (no 3 līdz 5):")
                 self.turn_label.pack()
 
             if not hasattr(self, 'turn_entry'):
