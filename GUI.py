@@ -272,7 +272,7 @@ class GUI(tk.Tk):
         self.player_radio_user = tk.Radiobutton(self.start_frame, text="Lietotājs", variable=self.player_var, value="user")
         self.player_radio_user.grid(row=0, column=1)
 
-        self.player_radio_computer = tk.Radiobutton(self.start_frame, text="dators", variable=self.player_var, value="computer")
+        self.player_radio_computer = tk.Radiobutton(self.start_frame, text="Dators", variable=self.player_var, value="computer")
         self.player_radio_computer.grid(row=0, column=2)
 
         self.algorithm_label = tk.Label(self.start_frame, text="Izvēlieties algoritmu, kuru izmantos dators")
