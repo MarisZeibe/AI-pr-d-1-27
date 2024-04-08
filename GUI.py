@@ -285,7 +285,7 @@ class GUI(tk.Tk):
         self.algorithm_radio_alpha_beta = tk.Radiobutton(self.start_frame, text="Alpha-Beta", variable=self.algorithm_var, value="alpha_beta")
         self.algorithm_radio_alpha_beta.grid(row=1, column=2)
 
-        self.start_num_label = tk.Label(self.start_frame, text="Ievadiet skaitli:")
+        self.start_num_label = tk.Label(self.start_frame, text="Ievadiet skaitli (no 20 līdz 30):")
         self.start_num_label.grid(row=2, column=0)
 
         self.start_num_entry = tk.Entry(self.start_frame)
