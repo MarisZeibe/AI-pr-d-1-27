@@ -343,7 +343,7 @@ class GUI(tk.Tk):
 
     def computer_turn(self):
         multiplier = self.game.computer_move()
-        messagebox.showinfo("Computer Turn", f"Computer chose multiplier: {multiplier}")
+        messagebox.showinfo("Datora gājiens", f"Dators izvēlējās reizinātāju: {multiplier}")
         self.update_game_info()
         self.play_turn()
 
