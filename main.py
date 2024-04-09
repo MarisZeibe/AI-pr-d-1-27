@@ -365,9 +365,9 @@ class GUI(tk.Tk):
 
     def end_game(self):
         points = self.game.state.points
-        points += self.game.state.bank * (-1 if points % 2 == 0 else 1)
+        points -= self.game.state.bank * (-1 if points % 2 == 0 else 1)
         winner = "lietotajs" if self.game.get_winner() == Player.USER else "dators"
-        messagebox.showinfo("Spēles beigas", f"Spēle beidzās, gala punkti: {points}\nUzvar {winner}.")
+        messagebox.showinfo("Spēles beigas", f"Spēle beidzās, gala punkti: {self.game.state.points}\nUzvar {winner}.")
 
         self.restart_game()
 
